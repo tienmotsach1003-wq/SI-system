@@ -57,46 +57,63 @@ button:hover{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { getDatabase, ref, set, get, remove } 
+from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey : "AIzaSyC1eUCFcMx9k5LWKOJQU3w9z8LszNve8-8" , 
-  authDomain : "thuvienvatly-40081.firebaseapp.com" , 
-  databaseURL : "https://thuvienvatly-40081-default-rtdb.asia-southeast1.firebasedatabase.app" , 
-  projectId : "thuvienvatly-40081" , 
-  storageBucket : "thuvienvatly-40081.firebasestorage.app" , 
-  messagingSenderId : "876358967500" , 
-  appId : "1:876358967500:web:209b7c8c2e130051996269" , 
-  measurementId : "G-1RLVFL4Q71" 
+  apiKey: "AIzaSyC1eUCFcMx9k5LWKOJQU3w9z8LszNve8-8",
+  authDomain: "thuvienvatly-40081.firebaseapp.com",
+  databaseURL: "https://thuvienvatly-40081-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "thuvienvatly-40081",
+  storageBucket: "thuvienvatly-40081.firebasestorage.app",
+  messagingSenderId: "876358967500",
+  appId: "1:876358967500:web:209b7c8c2e130051996269"
 };
 
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const wordsRef = ref(database, "tudien");
+const db = getDatabase(app);
 
-window.saveWord = function(){
-    const word = document.getElementById("word").value;
-    const meaning = document.getElementById("meaning").value;
-    if(word && meaning){
-        push(wordsRef,{
-            word:word,
-            meaning:meaning
-        });
-        document.getElementById("word").value="";
-        document.getElementById("meaning").value="";
-    }
-};
+function normalize(text){
+    return text.toLowerCase().trim();
+}
 
-onValue(wordsRef,(snapshot)=>{
-    const data = snapshot.val();
-    const list = document.getElementById("list");
-    list.innerHTML="";
-    for(let id in data){
-        list.innerHTML += `<div class="item"><b>${data[id].word}</b>: ${data[id].meaning}</div>`;
+window.searchTerm = async function(){
+    let term = normalize(document.getElementById("searchInput").value);
+    let snapshot = await get(ref(db,"dictionary/"+term));
+    
+    if(snapshot.exists()){
+        let data = snapshot.val();
+        document.getElementById("result").innerHTML =
+            "<h3>"+term.toUpperCase()+"</h3>"+
+            "<p><b>Định nghĩa:</b> "+data.meaning+"</p>"+
+            "<p><b>Công thức:</b> "+data.formula+"</p>";
+    }else{
+        document.getElementById("result").innerHTML =
+            "Không tìm thấy.";
     }
-});
+}
+
+window.addTerm = async function(){
+    let term = normalize(document.getElementById("newTerm").value);
+    let meaning = document.getElementById("newMeaning").value;
+    let formula = document.getElementById("newFormula").value;
+
+    await set(ref(db,"dictionary/"+term),{
+        meaning:meaning,
+        formula:formula
+    });
+
+    alert("Đã lưu online!");
+}
+
+window.deleteTerm = async function(){
+    let term = normalize(document.getElementById("deleteTerm").value);
+    await remove(ref(db,"dictionary/"+term));
+    alert("Đã xoá online!");
+}
 
 </script>
 
 </body>
 </html>
+
