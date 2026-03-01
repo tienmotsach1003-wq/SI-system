@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Từ Điển Vật Lí</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right,#c6f1ff,#ffd6ec);
+    margin:0;
+    padding:0;
+}
+
+header{
+    background:#0099cc;
+    color:white;
+    text-align:center;
+    padding:20px;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.container{
+    width:90%;
+    margin:auto;
+    margin-top:20px;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2{
+    color:#ff4da6;
+}
+
+input,textarea{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border-radius:8px;
+    border:2px solid #00bfff;
+}
+
+button{
+    padding:10px 15px;
+    margin:5px 0;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-blue{background:#00bfff;color:white;}
+.btn-pink{background:#ff4da6;color:white;}
+.btn-green{background:#00cc99;color:white;}
+.btn-red{background:#ff6666;color:white;}
+
+.result{
+    background:#f2faff;
+    padding:15px;
+    border-radius:10px;
+    margin-top:10px;
+    border-left:5px solid #00bfff;
+}
+
+.suggestion{
+    color:#ff4da6;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<header>📘 TỪ ĐIỂN VẬT LÍ</header>
+
+<div class="container">
+
+<!-- TÌM KIẾM -->
+<h2>🔍 Tìm kiếm</h2>
+<input type="text" id="searchInput" placeholder="Nhập thuật ngữ...">
+<button class="btn-blue" onclick="searchTerm()">Tìm kiếm</button>
+
+<div id="result" class="result"></div>
+
+<!-- THÊM TỪ -->
+<h2>➕ Thêm từ mới</h2>
+<input type="text" id="newTerm" placeholder="Tên thuật ngữ">
+<textarea id="newMeaning" placeholder="Định nghĩa"></textarea>
+<input type="text" id="newFormula" placeholder="Công thức (nếu có)">
+<button class="btn-green" onclick="addTerm()">Thêm từ</button>
+
+<!-- XOÁ TỪ -->
+<h2>🗑 Xoá từ</h2>
+<input type="text" id="deleteTerm" placeholder="Tên thuật ngữ cần xoá">
+<button class="btn-red" onclick="deleteTerm()">Xoá</button>
+
+<!-- LƯU / TẢI -->
+<h2>💾 Lưu & Tải dữ liệu</h2>
+<button class="btn-blue" onclick="saveData()">Lưu File</button>
+<input type="file" id="fileInput" onchange="loadData(event)">
+
+</div>
+
+<script>
+
+// =====================
+// 1. MÔ ĐUN LƯU TRỮ (Dictionary lồng nhau)
+// =====================
+let dictionary = {
+    "lực": {
+        "định nghĩa": "Đại lượng đặc trưng cho tác dụng đẩy hoặc kéo.",
+        "công thức": "F = m.a"
+    },
+    "công": {
+        "định nghĩa": "Đại lượng đo bằng tích của lực và quãng đường.",
+        "công thức": "A = F.s"
+    },
+    "động năng": {
+        "định nghĩa": "Năng lượng của vật do chuyển động.",
+        "công thức": "Wđ = 1/2 m v²"
+    }
+};
+
+// =====================
+// 2. CHUẨN HÓA DỮ LIỆU
+// =====================
+function normalize(text){
+    return text.toLowerCase().trim();
+}
+
+// =====================
+// 3. TÌM KIẾM
+// =====================
+function searchTerm(){
+    let input = normalize(document.getElementById("searchInput").value);
+    let resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = "";
+
+    if(dictionary[input]){
+        displayResult(input);
+    }else{
+        suggest(input);
+    }
+}
+
+// =====================
+// 4. HIỂN THỊ
+// =====================
+function displayResult(term){
+    let data = dictionary[term];
+    document.getElementById("result").innerHTML = 
+        "<h3>" + term.toUpperCase() + "</h3>" +
+        "<p><b>Định nghĩa:</b> " + data["định nghĩa"] + "</p>" +
+        "<p><b>Công thức:</b> " + data["công thức"] + "</p>";
+}
+
+// =====================
+// 5. ĐỀ XUẤT GẦN ĐÚNG
+// =====================
+function suggest(input){
+    let keys = Object.keys(dictionary);
+    let suggestions = keys.filter(k => k.includes(input));
+    
+    if(suggestions.length > 0){
+        document.getElementById("result").innerHTML =
+            "<p>Không tìm thấy chính xác. Bạn có muốn tìm: </p>" +
+            "<p class='suggestion'>" + suggestions.join(", ") + "</p>";
+    }else{
+        document.getElementById("result").innerHTML =
+            "<p>Không tìm thấy thuật ngữ.</p>";
+    }
+}
+
+// =====================
+// 6. THÊM TỪ
+// =====================
+function addTerm(){
+    let term = normalize(document.getElementById("newTerm").value);
+    let meaning = document.getElementById("newMeaning").value;
+    let formula = document.getElementById("newFormula").value;
+
+    if(!term || !meaning){
+        alert("Vui lòng nhập đầy đủ!");
+        return;
+    }
+
+    if(dictionary[term]){
+        alert("Từ đã tồn tại!");
+        return;
+    }
+
+    dictionary[term] = {
+        "định nghĩa": meaning,
+        "công thức": formula
+    };
+
+    alert("Đã thêm thành công!");
+}
+
+// =====================
+// 7. XOÁ TỪ
+// =====================
+function deleteTerm(){
+    let term = normalize(document.getElementById("deleteTerm").value);
+
+    if(dictionary[term]){
+        delete dictionary[term];
+        alert("Đã xoá!");
+    }else{
+        alert("Không tìm thấy từ!");
+    }
+}
+
+// =====================
+// 8. LƯU FILE
+// =====================
+function saveData(){
+    let dataStr = JSON.stringify(dictionary);
+    let blob = new Blob([dataStr], {type:"application/json"});
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "tudien_vatly.json";
+    a.click();
+}
+
+// =====================
+// 9. TẢI FILE
+// =====================
+function loadData(event){
+    let file = event.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+        dictionary = JSON.parse(e.target.result);
+        alert("Đã tải dữ liệu thành công!");
+    };
+
+    reader.readAsText(file);
+}
+
+</script>
+
+</body>
+</html>
