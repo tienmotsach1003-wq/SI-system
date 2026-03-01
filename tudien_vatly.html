@@ -1,74 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Từ Điển Vật Lý</title>
+<title>Từ Điển Vật Lí Online</title>
+
 <style>
 body{
+    margin:0;
     font-family: Arial;
-    background: linear-gradient(135deg,#00c6ff,#ff9acb);
-    text-align:center;
-    padding:30px;
+    background: linear-gradient(135deg,#d9f6ff,#ffd6ec);
 }
+
+header{
+    background:#00aaff;
+    color:white;
+    text-align:center;
+    padding:20px;
+    font-size:26px;
+    font-weight:bold;
+}
+
 .container{
+    width:90%;
+    max-width:900px;
+    margin:20px auto;
     background:white;
     padding:20px;
-    border-radius:15px;
-    width:400px;
-    margin:auto;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
-input,button{
+
+input,textarea{
+    width:100%;
     padding:10px;
-    margin:5px;
-    border-radius:8px;
-    border:1px solid #ccc;
+    margin:6px 0;
+    border-radius:10px;
+    border:2px solid #00bfff;
 }
+
 button{
-    background:#00c6ff;
-    color:white;
+    padding:8px 15px;
     border:none;
+    border-radius:10px;
     cursor:pointer;
+    margin-top:5px;
+    font-weight:bold;
 }
-button:hover{
-    background:#0099cc;
-}
-.item{
-    background:#ffe6f2;
-    margin:5px;
-    padding:5px;
-    border-radius:8px;
+
+.btn-blue{background:#00bfff;color:white;}
+.btn-green{background:#00cc99;color:white;}
+.btn-red{background:#ff6666;color:white;}
+
+.result{
+    background:#f0fbff;
+    padding:15px;
+    border-radius:15px;
+    margin-top:10px;
+    border-left:5px solid #00bfff;
 }
 </style>
 </head>
+
 <body>
 
+<header>📘 TỪ ĐIỂN VẬT LÍ ONLINE</header>
+
 <div class="container">
-<h2>Từ Điển Vật Lý</h2>
 
-<input id="word" placeholder="Nhập từ">
-<input id="meaning" placeholder="Nhập nghĩa">
-<br>
-<button onclick="saveWord()">Lưu</button>
+<h2>🔎 Tìm kiếm</h2>
+<input type="text" id="searchInput">
+<button class="btn-blue" onclick="searchTerm()">Tìm</button>
+<div id="result" class="result"></div>
 
-<div id="list"></div>
+<h2>➕ Thêm từ</h2>
+<input type="text" id="newTerm" placeholder="Tên thuật ngữ">
+<textarea id="newMeaning" placeholder="Định nghĩa"></textarea>
+<input type="text" id="newFormula" placeholder="Công thức">
+<button class="btn-green" onclick="addTerm()">Thêm</button>
+
+<h2>🗑 Xoá từ</h2>
+<input type="text" id="deleteTerm">
+<button class="btn-red" onclick="deleteTerm()">Xoá</button>
+
 </div>
 
 <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1eUCFcMx9k5LWKOJQU3w9z8LszNve8-8",
+    authDomain: "thuvienvatly-40081.firebaseapp.com",
+    databaseURL: "https://thuvienvatly-40081-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "thuvienvatly-40081",
+    storageBucket: "thuvienvatly-40081.firebasestorage.app",
+    messagingSenderId: "876358967500",
+    appId: "1:876358967500:web:209b7c8c2e130051996269",
+    measurementId: "G-1RLVFL4Q71"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+// ===================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, set, get, remove } 
 from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC1eUCFcMx9k5LWKOJQU3w9z8LszNve8-8",
-  authDomain: "thuvienvatly-40081.firebaseapp.com",
-  databaseURL: "https://thuvienvatly-40081-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "thuvienvatly-40081",
-  storageBucket: "thuvienvatly-40081.firebasestorage.app",
-  messagingSenderId: "876358967500",
-  appId: "1:876358967500:web:209b7c8c2e130051996269"
-};
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -116,4 +161,3 @@ window.deleteTerm = async function(){
 
 </body>
 </html>
-
